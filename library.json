@@ -1,0 +1,20 @@
+{
+  "name": "EmSensors",
+  "version": "1.0.0",
+  "description": "An tiny ESP32 IDF based sensors library",
+  "keywords": "",
+  "repository":  {
+    "type": "git",
+    "url": "https://github.com/cabbi/em_sensors.git"
+  },
+  "authors":  {
+    "name": "Fabio Cabella",
+    "maintainer": true
+  },
+  "dependencies": {
+    "cabbi/EmCore": ">=2.1.0"
+  },
+  "license": "BSD-3-Clause",
+  "frameworks": ["espidf"],
+  "platforms": "*"
+}
