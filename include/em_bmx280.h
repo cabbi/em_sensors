@@ -9,6 +9,18 @@
 #include <i2c.hpp>
 #include <bmp280.h>
 
+// TODO CABBI
+class EmBmx280 {
+public:
+    EmBmx280(){}
+    bool begin() { return false; }
+    bool read(float &temperature, float &pressure) { return false;}   
+    bool read(float &temperature, float &pressure, float &humidity) { return false; }
+    bool read(float &temperature, float &pressure, float *humidity) { return false; }    
+};
+
+
+#ifdef ________
 
 // The class for reading values from the BME280 and BMP280 devices
 class EmBmx280 {
@@ -17,14 +29,13 @@ public:
         : i2c_bus_(shared_i2c), dev_address_(dev_addr) {
         
         bme280_device_.intf = BME280_I2C_INTF;
-        bme280_device_.intf_ptr = this; // Passiamo 'this' come puntatore di contesto
+        bme280_device_.intf_ptr = this;
         bme280_device_.read = bme280_i2c_read_adapter;
         bme280_device_.write = bme280_i2c_write_adapter;
         bme280_device_.delay_us = bme280_delay_us_adapter;
 
         int8_t rslt = bme280_init(&bme280_device_);
         if (rslt != BME280_OK) {
-            std::cerr << "Errore inizializzazione BME280: " << (int)rslt << std::endl;
             return;
         }
 
@@ -35,15 +46,13 @@ public:
 
         uint8_t settings_sel = BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL;
         bme280_set_sensor_settings(settings_sel, &bme280_device_);
-        
-        // Imposta il sensore in modalità Normal (campionamento continuo)
         bme280_set_sensor_mode(BME280_NORMAL_MODE, &bme280_device_);
     }
 
     struct EnvironmentalData {
         float temperature; // °C
         float pressure;    // hPa (Hectopascal / millibar)
-        float humidity;    // % Umidità Relativa
+        float humidity;    // %
     };
 
     EnvironmentalData readData() {
@@ -55,10 +64,9 @@ public:
             return {0.0f, 0.0f, 0.0f};
         }
 
-        // Il driver ufficiale restituisce i dati convertiti in float o interi stabili
         return {
             static_cast<float>(comp_data.temperature),
-            static_cast<float>(comp_data.pressure) / 100.0f, // Converte Pa in hPa
+            static_cast<float>(comp_data.pressure) / 100.0f, // hPa/millibar
             static_cast<float>(comp_data.humidity)
         };
     }
@@ -68,7 +76,7 @@ public:
         return read(temperature, pressure, nullptr);
     }   
 
-    // Read temperature [deg.C], pressure [Pascal] and humidity [%] (BME280 ONLY!) data
+    // Read temperature [deg.C], pressure [hPascal] and humidity [%] (BME280 ONLY!) data
     bool read(float &temperature, float &pressure, float &humidity) {
         return read(temperature, pressure, &humidity);
     }
@@ -115,7 +123,7 @@ private:
         vTaskDelay(pdMS_TO_TICKS(ms));
     }
 };
-
+#endif
 #ifdef _____
 
 // The class for reading values from the BME280 and BMP280 devices

@@ -1,5 +1,5 @@
 dependencies:
-  idf: '>=5.1'
+  idf: '>=6.0'
   espp/i2c: "*"
   espp/ads1x15: "*"
   esp-idf-lib/bmp280: "*"
