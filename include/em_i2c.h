@@ -1,25 +1,50 @@
 #ifndef _I2C_BUS_H__
 #define _I2C_BUS_H__
 
-#include <driver/i2c_master.h>
-#include <hal/gpio_types.h>
+#include <i2c.hpp>
 
-class EmI2C {
+// A I2C wrapper around the ESP's one just to have a layer in case
+// of future support of new frameworks (e.g. Arduino)
+class EmI2c: public espp::I2c {
 public:
-    EmI2C();
-    ~EmI2C();
+    EmI2c(i2c_port_t port, 
+          gpio_num_t sdaPin,  
+          gpio_num_t sclPin, 
+          bool autoInit = true,
+          uint32_t timeoutMs = 10,
+          uint32_t clkSpeed = 100000) :
+        espp::I2c(Config {
+            .isr_core_id = -1,
+            .port = port,
+            .sda_io_num = sdaPin,
+            .scl_io_num = sclPin,
+            .sda_pullup_en = GPIO_PULLUP_DISABLE,
+            .scl_pullup_en = GPIO_PULLUP_DISABLE,
+            .timeout_ms = timeoutMs,
+            .clk_speed = clkSpeed,
+            .auto_init = autoInit,
+            .log_level = espp::Logger::Verbosity::WARN
+        }) {}
 
-    bool begin(i2c_port_t port, gpio_num_t sda_pin, gpio_num_t scl_pin, uint32_t clk_speed = 100000);    
-    void end();
+    virtual ~EmI2c() = default;
 
-    i2c_port_t getPort() const { return m_port; }
-    i2c_master_bus_handle_t getBusHandle() const { return m_bus_handle; }
-    bool isInitialized() const { return m_initialized; }
+    virtual bool begin() {
+        std::error_code err;
+        init(err);
+        return err.value() == ESP_OK;
+    }
 
-private:
-    i2c_port_t m_port;
-    i2c_master_bus_handle_t m_bus_handle; 
-    bool m_initialized;
+    virtual bool end() {
+        std::error_code err;
+        deinit(err);
+        return err.value() == ESP_OK;
+    }
+
+    virtual bool isInitialized() const { return initialized(); }
+
+    virtual i2c_port_t getPort() const { return config_.port; }
+    virtual gpio_num_t getSdaGpio() const { return config_.sda_io_num; }
+    virtual gpio_num_t getSclGpio() const { return config_.scl_io_num; }
 };
 
 #endif //_I2C_BUS_H__

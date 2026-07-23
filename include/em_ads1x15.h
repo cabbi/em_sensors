@@ -4,55 +4,55 @@
 
 #include <iostream>
 #include <system_error>
-#include "i2c.hpp"
-#include "ads1x15.hpp"
 
-/*
-espp::Ads1x15::Gain::TWOTHIRDS: Range di ±6.144V
-espp::Ads1x15::Gain::ONE: Range di ±4.096V
-espp::Ads1x15::Gain::TWO: Range di ±2.048V
-espp::Ads1x15::Gain::FOUR: Range di ±1.024V
-espp::Ads1x15::Gain::EIGHT: Range di ±0.512V
-espp::Ads1x15::Gain::SIXTEEN: Range di ±0.256V
-*/
+#include <ads1x15.hpp>
+
+#include "em_i2c.h"
+
+enum class Ads1x15Gain {
+    Range_6v144 = static_cast<int>(espp::Ads1x15::Gain::TWOTHIRDS),
+    Range_4v096 = static_cast<int>(espp::Ads1x15::Gain::ONE),
+    Range_2v048 = static_cast<int>(espp::Ads1x15::Gain::TWO),
+    Range_1v024 = static_cast<int>(espp::Ads1x15::Gain::FOUR),
+    Range_0v512 = static_cast<int>(espp::Ads1x15::Gain::EIGHT),
+    Range_0v256 = static_cast<int>(espp::Ads1x15::Gain::SIXTEEN)
+};
 
 class EmAds1x115 {
 public:
-    EmAds1x115(gpio_num_t sda_pin, gpio_num_t scl_pin, 
-                  espp::Ads1x15::Gain gain = espp::Ads1x15::Gain::ONE)
-        : m_i2c({
-              .port = I2C_NUM_1,
-              .sda_io_num = sda_pin,
-              .scl_io_num = scl_pin,
-              .clk_speed = 400000
-          }),
+    EmAds1x115(EmI2c& sharedI2c, 
+               Ads1x15Gain gain,
+               uint8_t address = espp::Ads1x15::DEFAULT_ADDRESS)
+        : m_sharedI2c(sharedI2c),
           m_ads(espp::Ads1x15::Ads1115Config{
-              .device_address = espp::Ads1x15::DEFAULT_ADDRESS,
+              .device_address = address,
               .write = [this](uint8_t addr, const uint8_t *data, size_t len) { 
-                  return i2c_bus_.write(addr, data, len); 
+                  return this->m_sharedI2c.write(addr, data, len); 
               },
               .read = [this](uint8_t addr, uint8_t *data, size_t len) { 
-                  return i2c_bus_.read(addr, data, len); 
+                  return this->m_sharedI2c.read(addr, data, len); 
               },
-              .gain = gain
+              .gain = static_cast<espp::Ads1x15::Gain>(gain)
           }) 
     {}
 
-    float readChannelVoltage(int channel) {
+    bool readChannelVoltage(int channel, float& voltage) {
         if (channel < 0 || channel > 3) return 0.0f;
 
         std::error_code ec;
-        float millivolts = ads_.sample_mv(channel, ec);
+        voltage = m_ads.sample_mv(channel, ec);
         if (ec) {
-            return 0.0f;
+            voltage = 0.0f;
+            return false;
         }
-        return millivolts / 1000.0f;
+        voltage /= 1000.0f;
+        return true;
     }
 
 private:
-    espp::I2c m_i2c;
+    EmI2c& m_sharedI2c;
     espp::Ads1x15 m_ads;
 };
 
 
-#endif __ADS1X15_H_
+#endif //__ADS1X15_H_
