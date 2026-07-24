@@ -9,20 +9,20 @@
 
 #include "em_i2c.h"
 
-enum class Ads1x15Gain {
-    Range_6v144 = static_cast<int>(espp::Ads1x15::Gain::TWOTHIRDS),
-    Range_4v096 = static_cast<int>(espp::Ads1x15::Gain::ONE),
-    Range_2v048 = static_cast<int>(espp::Ads1x15::Gain::TWO),
-    Range_1v024 = static_cast<int>(espp::Ads1x15::Gain::FOUR),
-    Range_0v512 = static_cast<int>(espp::Ads1x15::Gain::EIGHT),
-    Range_0v256 = static_cast<int>(espp::Ads1x15::Gain::SIXTEEN)
-};
-
-class EmAds1x115 {
+class EmAds1x15 {
 public:
-    EmAds1x115(EmI2c& sharedI2c, 
-               Ads1x15Gain gain,
-               uint8_t address = espp::Ads1x15::DEFAULT_ADDRESS)
+    enum class Gain {
+        Range_6v144 = static_cast<int>(espp::Ads1x15::Gain::TWOTHIRDS),
+        Range_4v096 = static_cast<int>(espp::Ads1x15::Gain::ONE),
+        Range_2v048 = static_cast<int>(espp::Ads1x15::Gain::TWO),
+        Range_1v024 = static_cast<int>(espp::Ads1x15::Gain::FOUR),
+        Range_0v512 = static_cast<int>(espp::Ads1x15::Gain::EIGHT),
+        Range_0v256 = static_cast<int>(espp::Ads1x15::Gain::SIXTEEN)
+    };
+
+    EmAds1x15(EmI2c& sharedI2c, 
+              Gain gain,
+              uint8_t address = espp::Ads1x15::DEFAULT_ADDRESS)
         : m_sharedI2c(sharedI2c),
           m_ads(espp::Ads1x15::Ads1115Config{
               .device_address = address,

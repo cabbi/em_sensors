@@ -1,6 +1,8 @@
 #ifndef _I2C_BUS_H__
 #define _I2C_BUS_H__
 
+#include <stdint.h>
+
 #include <i2c.hpp>
 
 // A I2C wrapper around the ESP's one just to have a layer in case
@@ -24,7 +26,7 @@ public:
             .clk_speed = clkSpeed,
             .auto_init = autoInit,
             .log_level = espp::Logger::Verbosity::WARN
-        }) {}
+        }) { }
 
     virtual ~EmI2c() = default;
 

@@ -12,6 +12,8 @@
     "maintainer": true
   },
   "dependencies": {
+    "espp/i2c": "^1.1.4",
+    "espp/ads1x15": "^1.1.4",
     "cabbi/EmCore": ">=2.1.0"
   },
   "license": "BSD-3-Clause",
