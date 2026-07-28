@@ -9,10 +9,10 @@
 // of future support of new frameworks (e.g. Arduino)
 class EmI2c: public espp::I2c {
 public:
-    EmI2c(i2c_port_t port, 
-          gpio_num_t sdaPin,  
+    EmI2c(gpio_num_t sdaPin,  
           gpio_num_t sclPin, 
           bool autoInit = true,
+          i2c_port_t port = (i2c_port_t)-1, 
           uint32_t timeoutMs = 10,
           uint32_t clkSpeed = 100000) :
         espp::I2c(Config {

@@ -1,7 +1,6 @@
-#include "i2c.hpp"
-
-//#include "em_bmx280.h"
 /*
+//#include "em_bmx280.h"
+
 bool EmBmx280::begin(uint8_t addr, IirFilter filter) {
     // Already initialized with this address?
     if (m_initialized && m_addr == addr) {
